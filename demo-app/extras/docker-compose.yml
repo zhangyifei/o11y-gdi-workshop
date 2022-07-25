@@ -1,7 +1,7 @@
 version: '3.7'
 services:
 
-  # Java demo application
+  # # Java demo application
   java:
     build:
       context: .
@@ -14,11 +14,21 @@ services:
     entrypoint: 'bash'
     environment:
       REDIS_HOSTNAME: 'redis'
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol-agent:4317
     command: './runJava.sh'
+    networks:
+      internalnetwork:
+        aliases:
+          - otel-network
+
   redis:
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      internalnetwork:
+        aliases:
+          - otel-network
 
   # Agent
   otelcol-agent:
@@ -36,7 +46,14 @@ services:
       - ${PWD}/agent-config.yaml:/etc/otelcol-config.yaml:ro
     ports:
       - "4317:4317"   # OTLP
-      - "55779:55679" # zpages extension
+      - "55679:55679" # zpages extension
+    expose:
+      - "4317"
+      - "55679"
+    networks:
+      internalnetwork:
+        aliases:
+          - otel-network
 
   # Gateway
   otelcol-gateway:
@@ -51,5 +68,15 @@ services:
     volumes:
       - ${PWD}/gateway-config.yaml:/etc/otelcol-config.yaml:ro
     ports:
-      - "4317:4317"   # OTLP
-      - "55679:55679" # zpages extension
+      - "4327:4317"   # OTLP
+      - "55689:55679" # zpages extension
+    expose:
+      - "4317"
+      - "55679"
+    networks:
+      internalnetwork:
+        aliases:
+          - otel-network
+
+networks:
+  internalnetwork: {}

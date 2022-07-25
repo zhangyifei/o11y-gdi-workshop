@@ -36,20 +36,20 @@ processors:
   # Optional: The following processor can be used to add a default "deployment.environment" attribute to the traces
   # when it's not populated by instrumentation libraries.
   # If enabled, make sure to enable this processor in the pipeline below.
-  #resource/add_environment:
-    #attributes:
-      #- action: insert
-        #value: staging/production/...
-        #key: deployment.environment
+  resource/add_environment:
+    attributes:
+      - action: insert
+        value: workshop-401testing
+        key: deployment.environment
 
 exporters:
   # Traces
   sapm:
-    access_token: "zC12PP6wHcJZG4z5QypVNM"
+    access_token: "pMIUgbzKE8sqIrT2cdq_8g"
     endpoint: "https://ingest.us0.signalfx.com/v2/trace"
   # Metrics + Events
   signalfx:
-    access_token: "zC12PP6wHcJZG4z5QypVNM"
+    access_token: "pMIUgbzKE8sqIrT2cdq_8g"
     realm: "us0"
     # no need to translate/exclude metrics when using as a gateway
     # metrics should be translated at agent
@@ -65,7 +65,7 @@ extensions:
     egress:
       endpoint: "https://api.us0.signalfx.com"
   zpages:
-    endpoint: 0.0.0.0:55679
+    endpoint: 0.0.0.0:55689
 
 service:
   extensions: [health_check, http_forwarder, zpages]
@@ -75,7 +75,7 @@ service:
       processors:
       - memory_limiter
       - batch
-      #- resource/add_environment
+      - resource/add_environment
       exporters: [sapm, signalfx]
     metrics:
       receivers: [otlp, prometheus]

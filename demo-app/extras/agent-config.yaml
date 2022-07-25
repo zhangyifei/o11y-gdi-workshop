@@ -27,7 +27,6 @@ receivers:
       thrift_binary:
       thrift_compact:
       thrift_http:
-  opencensus:
   otlp:
     protocols:
       grpc:
@@ -68,15 +67,16 @@ processors:
   # Optional: The following processor can be used to add a default "deployment.environment" attribute to the logs and 
   # traces when it's not populated by instrumentation libraries.
   # If enabled, make sure to enable this processor in the pipeline below.
-  #resource/add_environment:
-    #attributes:
-      #- action: insert
-        #value: staging/production/...
-        #key: deployment.environment
+  resource/add_environment:
+    attributes:
+      - action: insert
+        value: workshop-401testing
+        key: deployment.environment
 
 exporters:
   otlp:
-    insecure: true
+    tls:
+      insecure: true
     endpoint: otelcol-gateway:4317
 
 service:
@@ -88,7 +88,7 @@ service:
       - memory_limiter
       - batch
       - resourcedetection
-      #- resource/add_environment
+      - resource/add_environment
       exporters: [otlp]
     metrics:
       receivers: [otlp, signalfx, prometheus, hostmetrics]
